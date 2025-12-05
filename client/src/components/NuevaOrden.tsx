@@ -6,6 +6,7 @@ interface NuevaOrdenProps {
   recetas: Receta[];
   ingredientes: Ingrediente[];
   onProcesarOrden: (recetaId: string, cantidad: number) => void;
+  processingOrder?: boolean;
 }
 
 export default function NuevaOrden({
@@ -16,6 +17,7 @@ export default function NuevaOrden({
   const [categoriaActiva, setCategoriaActiva] = useState("todos");
   const [busqueda, setBusqueda] = useState("");
   const [cantidades, setCantidades] = useState<Record<string, number>>({});
+  const [processingRecetaId, setProcessingRecetaId] = useState<string | null>(null); // ⭐ NUEVO
 
   const recetasFiltradas = useMemo(() => {
     let lista = recetas;
@@ -99,8 +101,10 @@ export default function NuevaOrden({
     setCantidades((prev) => ({ ...prev, [recetaId]: clamped }));
   };
 
-  const confirmarOrdenInline = (recetaId: string, cantidad: number) => {
-    onProcesarOrden(recetaId, cantidad);
+  const confirmarOrdenInline = async (recetaId: string, cantidad: number) => {
+    setProcessingRecetaId(recetaId);
+    await onProcesarOrden(recetaId, cantidad);
+    setProcessingRecetaId(null);
     setCantidades((prev) => ({ ...prev, [recetaId]: 1 }));
   };
 
@@ -148,10 +152,13 @@ export default function NuevaOrden({
             const cantidadActual = cantidades[receta.id] ?? 1;
             const cantidadClamped = Math.min(Math.max(1, cantidadActual), Math.max(1, maxDisponible));
 
+            const isProcessing = processingRecetaId === receta.id;
+
             return (
               <article
                 key={receta.id}
-                className={`bg-white rounded-2xl shadow-md border border-gray-50 p-5 flex flex-col justify-between transition-transform hover:-translate-y-1 ${!puedeHacer ? "opacity-90" : ""}`}
+                className={`bg-white rounded-2xl shadow-md border border-gray-50 p-5 flex flex-col justify-between transition-all ${!puedeHacer ? "opacity-90" : ""
+                  } ${isProcessing ? "ring-2 ring-indigo-500 opacity-75" : "hover:-translate-y-1"}`}
               >
                 <div className="flex items-start gap-4">
                   <div className="min-w-0 flex-1">
@@ -166,7 +173,7 @@ export default function NuevaOrden({
                   </div>
 
                   <div className="flex-shrink-0 ml-2">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-50 to-indigo-50 flex items-center justify-center ring-1 ring-sky-100">
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br from-sky-50 to-indigo-50 flex items-center justify-center ring-1 ring-sky-100 transition-transform ${isProcessing ? 'animate-pulse' : ''}`}>
                       <span className="text-2xl">🍽️</span>
                     </div>
                   </div>
@@ -200,8 +207,8 @@ export default function NuevaOrden({
                         type="button"
                         onClick={() => decrementar(receta.id)}
                         aria-label={`Disminuir cantidad de ${receta.nombre}`}
-                        className="flex items-center justify-center px-3 py-2 text-sm bg-white hover:bg-gray-100 disabled:opacity-40"
-                        disabled={!puedeHacer || cantidadClamped <= 1}
+                        className="flex items-center justify-center px-3 py-2 text-sm bg-white hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                        disabled={!puedeHacer || cantidadClamped <= 1 || isProcessing}
                       >
                         −
                       </button>
@@ -213,15 +220,16 @@ export default function NuevaOrden({
                         value={cantidadClamped}
                         onChange={(e) => onChangeCantidad(receta.id, Number(e.target.value), maxDisponible)}
                         aria-label={`Cantidad para ${receta.nombre}`}
-                        className="w-16 text-center px-2 py-2 text-sm font-medium focus:outline-none"
+                        disabled={isProcessing}
+                        className="w-16 text-center px-2 py-2 text-sm font-medium focus:outline-none disabled:opacity-50"
                       />
 
                       <button
                         type="button"
                         onClick={() => incrementar(receta.id, Math.max(1, maxDisponible))}
                         aria-label={`Incrementar cantidad de ${receta.nombre}`}
-                        className="flex items-center justify-center px-3 py-2 text-sm bg-gradient-to-br from-sky-600 to-indigo-600 text-white hover:brightness-95 disabled:opacity-40"
-                        disabled={!puedeHacer || cantidadClamped >= maxDisponible}
+                        className="flex items-center justify-center px-3 py-2 text-sm bg-gradient-to-br from-sky-600 to-indigo-600 text-white hover:brightness-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                        disabled={!puedeHacer || cantidadClamped >= maxDisponible || isProcessing}
                       >
                         +
                       </button>
@@ -229,10 +237,23 @@ export default function NuevaOrden({
 
                     <button
                       onClick={() => confirmarOrdenInline(receta.id, cantidadClamped)}
-                      disabled={!puedeHacer || cantidadClamped <= 0 || maxDisponible === 0}
-                      className={`ml-18 px-3 py-2 rounded-md text-sm font-medium transition ${puedeHacer && maxDisponible > 0 ? "bg-gradient-to-br from-sky-600 to-indigo-600 text-white hover:brightness-95" : "bg-gray-100 text-gray-400 cursor-not-allowed"}`}
+                      disabled={!puedeHacer || cantidadClamped <= 0 || maxDisponible === 0 || isProcessing}
+                      className={`ml-18 px-3 py-2 rounded-md text-sm font-medium transition relative ${puedeHacer && maxDisponible > 0 && !isProcessing
+                        ? "bg-gradient-to-br from-sky-600 to-indigo-600 text-white hover:brightness-95"
+                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                        }`}
                     >
-                      Ordenar
+                      {isProcessing ? (
+                        <span className="flex items-center gap-2">
+                          <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Procesando...
+                        </span>
+                      ) : (
+                        "Ordenar"
+                      )}
                     </button>
                   </div>
 
@@ -245,7 +266,6 @@ export default function NuevaOrden({
           })}
         </div>
       )}
-
     </div>
   );
 }

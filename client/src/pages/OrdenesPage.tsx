@@ -10,6 +10,7 @@ export default function OrdenesPage() {
     recetasCargadas,
     ingredientesCargados,
     loading,
+    processingOrder,
     refrescarRecetas,
     refrescarIngredientes,
     procesarOrden
@@ -33,6 +34,7 @@ export default function OrdenesPage() {
       recetas={recetas}
       ingredientes={ingredientes}
       onProcesarOrden={procesarOrden}
+      processingOrder={processingOrder}
     />
   );
 }

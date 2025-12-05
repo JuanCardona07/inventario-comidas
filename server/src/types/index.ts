@@ -40,5 +40,5 @@ export interface DiaResumen {
   }
 }
 
-export type CategoriaReceta = 'hamburguesas' | 'Arepas' | 'Salchipapa' | 'Perros' | 'Carnes' | 'Patacones' | 'Bebidas';
-export type CategoriaIngrediente = 'carnes' | 'verduras' | 'panes' | 'salsas' | 'lacteos' | 'otros';
+export type CategoriaReceta = 'Hamburguesas' | 'Arepas' | 'Salchipapa' | 'Perros' | 'Carnes' | 'Patacones' | 'Bebidas';
+export type CategoriaIngrediente = 'Carnes' | 'Verduras' | 'Panes' | 'Salsas' | 'Lacteos' | 'Otros';

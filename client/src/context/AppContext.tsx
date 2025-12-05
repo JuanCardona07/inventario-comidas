@@ -13,6 +13,7 @@ interface AppContextType {
   recetas: Receta[];
   ordenes: Orden[];
   loading: boolean;
+  processingOrder: boolean;
 
   ingredientesCargados: boolean;
   recetasCargadas: boolean;
@@ -38,6 +39,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [recetas, setRecetas] = useState<Receta[]>([]);
   const [ordenes, setOrdenes] = useState<Orden[]>([]);
   const [loading, setLoading] = useState(false);
+  const [processingOrder, setProcessingOrder] = useState(false); // ⭐ NUEVO
 
   const [ingredientesCargados, setIngredientesCargados] = useState(false);
   const [recetasCargadas, setRecetasCargadas] = useState(false);
@@ -87,24 +89,62 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const actualizarIngredientesLocalmente = (recetaId: string, cantidad: number) => {
+    const receta = recetas.find((r) => r.id === recetaId);
+    if (!receta || !receta.ingredientes) return;
+
+    setIngredientes((prevIngredientes) =>
+      prevIngredientes.map((ing) => {
+        const recetaIng = receta.ingredientes.find(
+          (ri) => ri.ingredienteId === ing.id
+        );
+        if (recetaIng) {
+          return {
+            ...ing,
+            cantidad: Math.max(0, ing.cantidad - recetaIng.cantidad * cantidad),
+          };
+        }
+        return ing;
+      })
+    );
+  };
+
   const procesarOrden = async (recetaId: string, cantidad: number) => {
+    if (processingOrder) return;
+
     try {
-      const nuevaOrden = await ordenesService.create(recetaId, cantidad);
-
-      setOrdenes([nuevaOrden, ...ordenes]);
-
-      await refrescarIngredientes();
+      setProcessingOrder(true);
 
       const receta = recetas.find((r) => r.id === recetaId);
+
+      actualizarIngredientesLocalmente(recetaId, cantidad);
+
+      const nuevaOrden = await ordenesService.create(recetaId, cantidad);
+
+      setOrdenes((prev) => [nuevaOrden, ...prev]);
+
       showToast(
         `✅ Orden procesada: ${cantidad}x ${receta?.nombre}`,
         "success"
       );
+
+      ingredientesService.getAll().then(data => {
+        setIngredientes(data);
+      }).catch(err => {
+        console.error('Error al sincronizar ingredientes:', err);
+      });
+
     } catch (error: any) {
+      await refrescarIngredientes();
+
       const mensaje =
-        error.response?.data?.error || "Error al procesar la orden";
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Error al procesar la orden";
       showToast(mensaje, "error");
       console.error(error);
+    } finally {
+      setProcessingOrder(false);
     }
   };
 
@@ -113,16 +153,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
     cantidad: number
   ) => {
     try {
-      await ingredientesService.reabastecer(ingredienteId, cantidad);
+      setIngredientes((prev) =>
+        prev.map((ing) =>
+          ing.id === ingredienteId
+            ? { ...ing, cantidad: ing.cantidad + cantidad }
+            : ing
+        )
+      );
 
-      await refrescarIngredientes();
+      await ingredientesService.reabastecer(ingredienteId, cantidad);
 
       const ingrediente = ingredientes.find((i) => i.id === ingredienteId);
       showToast(
         `✅ Reabastecido: +${cantidad} ${ingrediente?.unidad} de ${ingrediente?.nombre}`,
         "success"
       );
+
+      refrescarIngredientes();
     } catch (error: any) {
+      await refrescarIngredientes();
+
       const mensaje =
         error.response?.data?.error || "Error al reabastecer ingrediente";
       showToast(mensaje, "error");
@@ -137,6 +187,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         recetas,
         ordenes,
         loading,
+        processingOrder, // ⭐ NUEVO
         ingredientesCargados,
         recetasCargadas,
         ordenesCargadas,

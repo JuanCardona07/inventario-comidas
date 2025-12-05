@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-gray-900 transition-colors duration-300;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body {
+      @apply bg-slate-900 text-gray-100;
+    }
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes bounceOnce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out;
+}
+
+.animate-bounce-once {
+  animation: bounceOnce 1s ease-out;
+}
+
+.logo-badge {
+  background: linear-gradient(135deg, #ff8a4b 0%, #d9480f 60%);
+  box-shadow: 0 4px 12px rgba(217, 72, 15, 0.14);
+  will-change: transform, background-position;
+  background-size: 200% 200%;
+  border-radius: 50%;
+  padding: 0.5rem;
+  transition: transform 180ms ease, background-position 900ms ease;
+  animation: badgeIn 420ms cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.logo-badge:hover {
+  background-position: 100% 0%;
+  transform: translateY(-3px) scale(1.04);
+}
+
+@keyframes badgeIn {
+  from {
+    transform: translateY(6px) scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+nav a:focus {
+  outline: 2px solid rgba(249, 115, 22, 0.18);
+  outline-offset: 2px;
+  border-radius: 6px;
+}

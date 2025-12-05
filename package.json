@@ -1,0 +1,14 @@
+{
+  "name": "inventario-comidas-fullstack",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev:client": "npm --prefix ./client run dev --silent",
+    "dev:server": "npm --prefix ./server run dev --silent",
+
+    "dev": "concurrently --raw --prefix-colors \"cyan,green\" --names \"CLIENT,SERVER\" \"npm --prefix ./client run dev --silent\" \"npm --prefix ./server run dev --silent\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

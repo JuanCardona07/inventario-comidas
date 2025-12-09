@@ -35,10 +35,12 @@ export default function GraficaVentasPorCategoria({ ordenes }: GraficaVentasPorC
     if (active && payload && payload.length) {
       const porcentaje = ((payload[0].value / ordenes.reduce((s, o) => s + o.total, 0)) * 100).toFixed(1);
       return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-semibold">{payload[0].payload.categoria}</p>
-          <p className="text-green-600">{currency.format(payload[0].value)}</p>
-          <p className="text-gray-600 text-sm">{porcentaje}% del total</p>
+        <div className="bg-gradient-to-br from-slate-800 to-slate-700 p-4 border border-slate-600 rounded-lg shadow-xl">
+          <p className="font-semibold text-white mb-2">{payload[0].payload.categoria}</p>
+          <p className="text-emerald-400 text-sm">
+            <span className="font-bold">{currency.format(payload[0].value)}</span>
+          </p>
+          <p className="text-slate-300 text-xs mt-1">{porcentaje}% del total</p>
         </div>
       );
     }
@@ -51,8 +53,11 @@ export default function GraficaVentasPorCategoria({ ordenes }: GraficaVentasPorC
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h3 className="text-lg font-bold text-gray-900 mb-4">🥧 Ventas por Categoría</h3>
+    <div className="bg-gradient-to-br from-slate-800 to-slate-700 p-6 rounded-xl shadow-lg border border-slate-600">
+      <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+        <span className="text-2xl">🥧</span>
+        Ventas por Categoría
+      </h3>
       <ResponsiveContainer width="100%" height={300}>
         <PieChart>
           <Pie
@@ -62,6 +67,8 @@ export default function GraficaVentasPorCategoria({ ordenes }: GraficaVentasPorC
             labelLine={false}
             label={renderLabel}
             outerRadius={100}
+            stroke="#1e293b"
+            strokeWidth={3}
             fill="#8884d8"
             dataKey="ventas"
           >

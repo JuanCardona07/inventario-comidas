@@ -11,7 +11,7 @@ function App() {
   return (
     <BrowserRouter>
       <AppProvider>
-        <div className="min.h-screen bg-slate-950 text-gray-900">
+        <div className="min-h-screen bg-slate-950 text-gray-900">
           <Layout>
             <Routes>
               <Route path="/" element={<Navigate to="/inventario" replace />} />

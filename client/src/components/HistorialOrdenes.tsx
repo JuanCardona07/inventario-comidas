@@ -66,85 +66,82 @@ export default function HistorialOrdenes({ ordenes }: HistorialOrdenesProps) {
   );
 
   return (
-    <div className="px-2 sm:px-4 md:px-6 max-w-7xl mx-auto">
-      <div className="space-y-3">
-        <div className="flex items-center justify-between text-sm text-gray-600">
-          <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-2">
-              <svg className="w-4 h-4" />{" "}
-            </span>
-            <span>
-              {ordenesFiltradas.length} de {ordenes.length} órdenes
-            </span>
-          </div>
+    <div className="w-full px-3 sm:px-4 md:px-6 py-4">
+      <div className="space-y-4 max-w-7xl mx-auto">
+        <div className="flex items-center justify-between text-sm text-slate-300">
+          <span>
+            {ordenesFiltradas.length} de {ordenes.length} órdenes
+          </span>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-3">
-          <div className="flex-1 bg-white p-3 shadow-sm relative" style={{
-            clipPath: 'polygon(0 8px, 8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px))'
-          }}>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <h2 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
-                <Calendar className="text-sky-600" size={16} />
+        <div className="flex flex-col gap-4">
+          <div className="w-full bg-gradient-to-br from-slate-800 to-slate-700 p-4 rounded-xl shadow-lg border border-slate-600">
+            <div className="flex flex-col gap-3">
+              <h2 className="text-sm font-semibold text-white flex items-center gap-2">
+                <Calendar className="text-blue-400 flex-shrink-0" size={18} />
                 Filtrar por Fecha
               </h2>
 
-              <div className="flex items-center gap-2">
-                <input
-                  type="date"
-                  value={fechaInicio}
-                  onChange={(e) => setFechaInicio(e.target.value)}
-                  className="border rounded-md px-2 py-1 text-sm"
-                />
-                <input
-                  type="date"
-                  value={fechaFin}
-                  onChange={(e) => setFechaFin(e.target.value)}
-                  className="border rounded-md px-2 py-1 text-sm"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="flex flex-col">
+                  <label className="text-xs text-slate-300 font-medium mb-2">Desde</label>
+                  <input
+                    type="date"
+                    value={fechaInicio}
+                    onChange={(e) => setFechaInicio(e.target.value)}
+                    className="w-full bg-slate-700 border border-slate-600 text-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-xs text-slate-300 font-medium mb-2">Hasta</label>
+                  <input
+                    type="date"
+                    value={fechaFin}
+                    onChange={(e) => setFechaFin(e.target.value)}
+                    className="w-full bg-slate-700 border border-slate-600 text-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  />
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="flex-1 bg-white p-3 shadow-sm relative" style={{
-            clipPath: 'polygon(0 8px, 8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px))'
-          }}>
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
-                <Filter className="text-sky-600" size={16} />
+          <div className="w-full bg-gradient-to-br from-slate-800 to-slate-700 p-4 rounded-xl shadow-lg border border-slate-600">
+            <div className="flex flex-col gap-3">
+              <h2 className="text-sm font-semibold text-white flex items-center gap-2">
+                <Filter className="text-blue-400 flex-shrink-0" size={18} />
                 Filtrar por Categoría
               </h2>
-            </div>
 
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => setCategoriaActiva("todos")}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium shadow-sm transition ${categoriaActiva === "todos"
-                  ? "bg-gradient-to-r from-sky-600 to-indigo-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-              >
-                Todos
-              </button>
-
-              {categoriasDisponibles.map((cat) => (
+              <div className="flex flex-wrap gap-2">
                 <button
-                  key={cat}
-                  onClick={() => setCategoriaActiva(cat)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium shadow-sm transition ${categoriaActiva === cat
-                    ? "bg-gradient-to-r from-sky-600 to-indigo-600 text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  onClick={() => setCategoriaActiva("todos")}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium shadow-md transition flex-shrink-0 ${categoriaActiva === "todos"
+                    ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white"
+                    : "bg-slate-700 text-slate-300 hover:bg-slate-600"
                     }`}
                 >
-                  {cat}
+                  Todos
                 </button>
-              ))}
+
+                {categoriasDisponibles.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setCategoriaActiva(cat)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium shadow-md transition flex-shrink-0 ${categoriaActiva === cat
+                      ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white"
+                      : "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                      }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
         {fechasOrdenadas.length === 0 ? (
-          <div className="bg-white p-3 rounded-2xl shadow-md text-center text-gray-500">
+          <div className="w-full bg-gradient-to-br from-slate-800 to-slate-700 p-6 rounded-xl shadow-lg text-center text-slate-300 border border-slate-600">
             {ordenes.length === 0
               ? "No hay órdenes registradas aún"
               : "No hay órdenes que coincidan con los filtros"}
@@ -166,70 +163,72 @@ export default function HistorialOrdenes({ ordenes }: HistorialOrdenesProps) {
                 <section
                   key={fecha}
                   aria-labelledby={`dia-${fecha}`}
-                  className="space-y-2"
+                  className="space-y-3"
                 >
                   <header
                     onClick={() => toggleDia(fecha)}
-                    className="bg-gradient-to-r from-sky-600 to-indigo-600 text-white p-3 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 shadow-md cursor-pointer hover:from-sky-700 hover:to-indigo-700 transition-all"
+                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-lg cursor-pointer hover:from-blue-700 hover:to-blue-800 transition-all"
                   >
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">
+                    <div className="flex items-start gap-3 min-w-0">
+                      <span className="text-lg flex-shrink-0 mt-1">
                         {diasExpandidos.has(fecha) ? '▼' : '▶'}
                       </span>
-                      <div>
+                      <div className="min-w-0">
                         <h3
                           id={`dia-${fecha}`}
-                          className="font-bold text-sm sm:text-base capitalize"
+                          className="font-bold text-base sm:text-lg capitalize flex items-center gap-2 break-words"
                         >
-                          <CalendarDays size={14} className="inline" /> {fechaTexto}
+                          <CalendarDays size={18} className="flex-shrink-0" /> {fechaTexto}
                         </h3>
-                        <p className="text-xs sm:text-sm text-sky-100 mt-1">
+                        <p className="text-xs sm:text-sm text-blue-200 mt-1">
                           {ordenesDelDia.length} orden
                           {ordenesDelDia.length !== 1 ? "es" : ""}
                         </p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-lg sm:text-xl font-bold">
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-lg sm:text-2xl font-bold">
                         {currency.format(totalDia)}
                       </p>
-                      <p className="text-xs sm:text-sm text-sky-100 mt-1">
+                      <p className="text-xs sm:text-sm text-blue-200 mt-1">
                         Total del día
                       </p>
                     </div>
                   </header>
 
                   {diasExpandidos.has(fecha) && (
-                    <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                       {ordenesDelDia.map((orden) => (
                         <article
                           key={orden.id}
-                          className="bg-white p-3 rounded-2xl shadow-sm hover:shadow-md transition-all duration-150 flex flex-col justify-between border border-gray-50"
+                          className="bg-gradient-to-br from-slate-800 to-slate-700 p-4 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-200 flex flex-col justify-between border border-slate-600 hover:-translate-y-1"
                           aria-label={`${orden.cantidad}x ${orden.recetaNombre} - ${orden.hora}`}
                         >
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="min-w-0">
-                              <h4 className="font-semibold text-sm sm:text-base truncate">
-                                {orden.cantidad}x {orden.recetaNombre}
-                              </h4>
-                              {orden.categoria ? (
-                                <span className="inline-block mt-2 px-2 py-0.5 bg-sky-50 text-sky-700 text-xs rounded-full capitalize">
-                                  {orden.categoria}
-                                </span>
-                              ) : (
-                                <span className="inline-block mt-2 px-2 py-0.5 bg-gray-100 text-gray-500 text-xs rounded-full">
-                                  Sin categoría
-                                </span>
-                              )}
-                              <p className="text-xs text-gray-500 mt-2">
-                                🕐 {orden.hora}
-                              </p>
-                            </div>
-                            <div className="flex-shrink-0 text-right ml-2">
-                              <p className="text-base sm:text-lg font-bold text-emerald-600 whitespace-nowrap">
+                          <div className="flex flex-col gap-3">
+                            <div className="flex items-start justify-between gap-3 min-w-0">
+                              <div className="min-w-0 flex-1">
+                                <h4 className="font-semibold text-sm text-white break-words">
+                                  {orden.cantidad}x {orden.recetaNombre}
+                                </h4>
+                              </div>
+                              <p className="text-base sm:text-lg font-bold text-emerald-400 flex-shrink-0">
                                 {currency.format(orden.total)}
                               </p>
                             </div>
+
+                            {orden.categoria ? (
+                              <span className="inline-block px-2 py-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs rounded-full capitalize shadow-md w-fit">
+                                {orden.categoria}
+                              </span>
+                            ) : (
+                              <span className="inline-block px-2 py-1 bg-slate-600 text-slate-300 text-xs rounded-full w-fit">
+                                Sin categoría
+                              </span>
+                            )}
+
+                            <p className="text-xs text-slate-400">
+                              🕐 {orden.hora}
+                            </p>
                           </div>
                         </article>
                       ))}
@@ -239,10 +238,10 @@ export default function HistorialOrdenes({ ordenes }: HistorialOrdenesProps) {
               );
             })}
 
-            <div className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white p-3 rounded-2xl mt-2 shadow-lg">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+            <div className="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white p-4 rounded-xl shadow-lg border border-emerald-500">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
-                  <span className="font-semibold text-sm sm:text-base">
+                  <span className="font-semibold text-base sm:text-lg flex items-center gap-2">
                     💰 Total de ventas
                   </span>
                   <p className="text-xs sm:text-sm text-emerald-100 mt-1">
@@ -253,7 +252,7 @@ export default function HistorialOrdenes({ ordenes }: HistorialOrdenesProps) {
                       ` (${fechaInicio} al ${fechaFin})`}
                   </p>
                 </div>
-                <span className="text-xl sm:text-2xl font-bold">
+                <span className="text-2xl sm:text-3xl font-bold">
                   {currency.format(totalVentas)}
                 </span>
               </div>

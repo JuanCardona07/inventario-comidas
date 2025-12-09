@@ -32,33 +32,29 @@ export default function TarjetasEstadisticas({ ordenes, ingredientesBajos }: Tar
       titulo: 'Ventas Totales',
       valor: currency.format(estadisticas.totalVentas),
       icono: DollarSign,
-      color: 'bg-green-500',
-      colorClaro: 'bg-green-50',
-      colorTexto: 'text-green-700',
+      colorIcono: 'text-emerald-400',
+      colorValor: 'text-emerald-400',
     },
     {
       titulo: 'Total de Órdenes',
       valor: estadisticas.totalOrdenes.toString(),
       icono: ShoppingCart,
-      color: 'bg-blue-500',
-      colorClaro: 'bg-blue-50',
-      colorTexto: 'text-blue-700',
+      colorIcono: 'text-blue-400',
+      colorValor: 'text-blue-400',
     },
     {
       titulo: 'Productos Vendidos',
       valor: estadisticas.totalProductos.toString(),
       icono: TrendingUp,
-      color: 'bg-purple-500',
-      colorClaro: 'bg-purple-50',
-      colorTexto: 'text-purple-700',
+      colorIcono: 'text-purple-400',
+      colorValor: 'text-purple-400',
     },
     {
       titulo: 'Promedio por Orden',
       valor: currency.format(estadisticas.promedioVenta),
       icono: DollarSign,
-      color: 'bg-orange-500',
-      colorClaro: 'bg-orange-50',
-      colorTexto: 'text-orange-700',
+      colorIcono: 'text-orange-400',
+      colorValor: 'text-orange-400',
     },
   ];
 
@@ -70,15 +66,15 @@ export default function TarjetasEstadisticas({ ordenes, ingredientesBajos }: Tar
           return (
             <div
               key={tarjeta.titulo}
-              className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+              className="bg-gradient-to-br from-slate-800 to-slate-700 rounded-xl shadow-lg p-6 border border-slate-600 hover:shadow-xl transition-all hover:scale-105"
             >
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 font-medium">{tarjeta.titulo}</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-2">{tarjeta.valor}</p>
+                <div className="flex-1">
+                  <p className="text-sm text-slate-300 font-medium mb-2">{tarjeta.titulo}</p>
+                  <p className={`text-2xl font-bold ${tarjeta.colorValor}`}>{tarjeta.valor}</p>
                 </div>
-                <div className={`${tarjeta.colorClaro} p-3 rounded-full`}>
-                  <Icono className={`w-6 h-6 ${tarjeta.colorTexto}`} />
+                <div className="bg-slate-700 p-3 rounded-lg border border-slate-600">
+                  <Icono className={`w-6 h-6 ${tarjeta.colorIcono}`} />
                 </div>
               </div>
             </div>
@@ -87,18 +83,25 @@ export default function TarjetasEstadisticas({ ordenes, ingredientesBajos }: Tar
       </div>
 
       {ingredientesBajos.length > 0 && (
-        <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+        <div className="bg-gradient-to-br from-red-900/40 to-red-800/40 border border-red-700 p-6 rounded-xl shadow-lg">
           <div className="flex items-start">
-            <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5 mr-3 flex-shrink-0" />
-            <div>
-              <h3 className="text-sm font-semibold text-red-800">
-                ⚠️ Ingredientes con stock bajo ({ingredientesBajos.length})
+            <div className="bg-red-800 p-3 rounded-lg border border-red-700 mr-4 flex-shrink-0">
+              <AlertTriangle className="w-6 h-6 text-red-300" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-base font-bold text-white flex items-center gap-2 mb-3">
+                <span className="text-xl">⚠️</span>
+                Ingredientes con stock bajo ({ingredientesBajos.length})
               </h3>
-              <div className="mt-2 text-sm text-red-700">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {ingredientesBajos.map((ing) => (
-                  <span key={ing.id} className="inline-block mr-3 mb-1">
-                    • {ing.nombre}: {ing.cantidad} {ing.unidad}
-                  </span>
+                  <div key={ing.id} className="bg-red-800/30 p-3 rounded-lg border border-red-700/50">
+                    <p className="text-sm text-red-200">
+                      <span className="font-semibold text-white">{ing.nombre}</span>
+                      <br />
+                      <span className="text-red-300">{ing.cantidad} {ing.unidad}</span>
+                    </p>
+                  </div>
                 ))}
               </div>
             </div>

@@ -5,7 +5,7 @@ import Filtros from "./Filtros";
 interface NuevaOrdenProps {
   recetas: Receta[];
   ingredientes: Ingrediente[];
-  onProcesarOrden: (recetaId: string, cantidad: number) => void;
+  onProcesarOrden: (recetaId: string, cantidad: number) => Promise<void> | void;
   processingOrder?: boolean;
 }
 
@@ -17,15 +17,14 @@ export default function NuevaOrden({
   const [categoriaActiva, setCategoriaActiva] = useState("todos");
   const [busqueda, setBusqueda] = useState("");
   const [cantidades, setCantidades] = useState<Record<string, number>>({});
-  const [processingRecetaId, setProcessingRecetaId] = useState<string | null>(null); // ⭐ NUEVO
+  const [processingRecetaId, setProcessingRecetaId] = useState<string | null>(null);
 
   const recetasFiltradas = useMemo(() => {
     let lista = recetas;
 
     if (categoriaActiva !== "todos") {
       lista = lista.filter(
-        (r) =>
-          (r.categoria ?? "").toLowerCase() === categoriaActiva.toLowerCase()
+        (r) => (r.categoria ?? "").toLowerCase() === categoriaActiva.toLowerCase()
       );
     }
 
@@ -103,25 +102,20 @@ export default function NuevaOrden({
 
   const confirmarOrdenInline = async (recetaId: string, cantidad: number) => {
     setProcessingRecetaId(recetaId);
-    await onProcesarOrden(recetaId, cantidad);
-    setProcessingRecetaId(null);
-    setCantidades((prev) => ({ ...prev, [recetaId]: 1 }));
+    try {
+      await onProcesarOrden(recetaId, cantidad);
+    } finally {
+      setProcessingRecetaId(null);
+      setCantidades((prev) => ({ ...prev, [recetaId]: 1 }));
+    }
   };
 
   return (
     <div className="px-2 sm:px-4 md:px-6 max-w-7xl mx-auto">
-      <div className="flex flex-col items-center justify-center mb-8 gap-3">
-        <span className="text-sm text-gray-600 font-medium text-center">
+      <div className="flex flex-col items-center justify-center mb-8 gap-4">
+        <span className="text-sm text-slate-300 font-medium text-center">
           {recetasFiltradas.length} de {recetas.length} recetas
         </span>
-
-        <input
-          type="text"
-          placeholder="Buscar receta..."
-          value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
-          className="w-64 px-3 py-1.5 text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-        />
 
         {categoriasDisponibles.length > 1 && (
           <div className="w-full flex justify-center">
@@ -130,17 +124,19 @@ export default function NuevaOrden({
               categorias={categoriasDisponibles}
               categoriaActiva={categoriaActiva}
               onCambiarCategoria={setCategoriaActiva}
+              onChangeQuery={(q) => setBusqueda(q)}
+              mostrarTodos={true}
             />
           </div>
         )}
       </div>
 
       {recetasFiltradas.length === 0 ? (
-        <div className="bg-white p-6 rounded-2xl shadow-md text-center text-gray-500">
+        <div className="bg-gradient-to-br from-slate-800 to-slate-700 p-6 rounded-2xl shadow-md text-center text-slate-300 border border-slate-600">
           No hay recetas disponibles
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 -mt-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {recetasFiltradas.map((receta) => {
             const puedeHacer =
               receta.ingredientes?.every((ri) => {
@@ -154,60 +150,72 @@ export default function NuevaOrden({
 
             const isProcessing = processingRecetaId === receta.id;
 
+            const cardBg = puedeHacer
+              ? "bg-gradient-to-br from-slate-800 to-slate-700 border-slate-600"
+              : "bg-gradient-to-br from-slate-800 to-slate-700 border-red-500/50";
+
             return (
               <article
                 key={receta.id}
-                className={`bg-white rounded-2xl shadow-md border border-gray-50 p-5 flex flex-col justify-between transition-all ${!puedeHacer ? "opacity-90" : ""
-                  } ${isProcessing ? "ring-2 ring-indigo-500 opacity-75" : "hover:-translate-y-1"}`}
+                className={`rounded-2xl shadow-lg border p-5 flex flex-col justify-between transition-all ${cardBg} ${isProcessing ? "ring-2 ring-yellow-400 opacity-90" : "hover:-translate-y-1 hover:shadow-2xl"
+                  }`}
               >
                 <div className="flex items-start gap-4">
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-lg sm:text-xl font-semibold truncate text-gray-900">
+                    <h3 className={`text-lg sm:text-xl font-semibold truncate ${puedeHacer ? "text-white" : "text-red-400"}`}>
                       {receta.nombre}
                     </h3>
                     <div className="mt-2 flex items-center gap-2">
-                      <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-xs capitalize">
+                      <span className="px-3 py-1 bg-gradient-to-r from-red-500 to-yellow-500 text-white rounded-full text-xs capitalize shadow-md font-medium">
                         {receta.categoria ?? "—"}
                       </span>
                     </div>
                   </div>
 
                   <div className="flex-shrink-0 ml-2">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br from-sky-50 to-indigo-50 flex items-center justify-center ring-1 ring-sky-100 transition-transform ${isProcessing ? 'animate-pulse' : ''}`}>
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${isProcessing
+                      ? "from-yellow-400 to-orange-400"
+                      : puedeHacer
+                        ? "from-yellow-500 to-orange-500"
+                        : "from-red-500 to-red-600"
+                      } flex items-center justify-center shadow-md transition-transform ${isProcessing ? 'animate-pulse' : ''
+                      }`}>
                       <span className="text-2xl">🍽️</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-4 border-t pt-4 text-sm text-gray-600">
-                  <p className="font-medium mb-2">Ingredientes</p>
-                  <div className="space-y-2 max-h-44 overflow-auto pr-1">
+                <div className="mt-4 border-t border-slate-600 pt-4 text-sm">
+                  <p className="font-semibold mb-2 text-yellow-400">Ingredientes</p>
+                  <div className={`space-y-2 ${receta.ingredientes?.length > 8 ? 'max-h-64 overflow-y-auto pr-1' : ''}`}>
                     {receta.ingredientes?.length ? (
                       receta.ingredientes.map((ri) => {
                         const ing = ingredientes.find((i) => i.id === ri.ingredienteId);
+                        const tieneStock = ing && ing.cantidad >= ri.cantidad;
                         return (
-                          <div key={ri.ingredienteId} className="flex justify-between text-sm text-gray-700">
+                          <div key={ri.ingredienteId} className={`flex justify-between text-sm pb-2 border-b border-slate-700/50 ${tieneStock ? "text-slate-300" : "text-red-400"
+                            }`}>
                             <span className="truncate">{ing?.nombre ?? "Ingrediente desconocido"}</span>
-                            <span className="ml-2 whitespace-nowrap text-gray-500">
+                            <span className="ml-2 whitespace-nowrap text-slate-400">
                               {ri.cantidad} {ing?.unidad ?? ""}
                             </span>
                           </div>
                         );
                       })
                     ) : (
-                      <div className="text-sm text-gray-500">Sin ingredientes listados</div>
+                      <div className="text-sm text-slate-400">Sin ingredientes listados</div>
                     )}
                   </div>
                 </div>
 
-                <div className="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between gap-3">
+                <div className="mt-5 pt-4 border-t border-slate-600 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="flex items-center rounded-full bg-white shadow-sm border border-gray-100 overflow-hidden">
+                    <div className="flex items-center rounded-lg bg-slate-700 shadow-md border border-slate-600 overflow-hidden">
                       <button
                         type="button"
                         onClick={() => decrementar(receta.id)}
                         aria-label={`Disminuir cantidad de ${receta.nombre}`}
-                        className="flex items-center justify-center px-3 py-2 text-sm bg-white hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="flex items-center justify-center px-3 py-2 text-sm text-slate-300 hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition"
                         disabled={!puedeHacer || cantidadClamped <= 1 || isProcessing}
                       >
                         −
@@ -221,14 +229,14 @@ export default function NuevaOrden({
                         onChange={(e) => onChangeCantidad(receta.id, Number(e.target.value), maxDisponible)}
                         aria-label={`Cantidad para ${receta.nombre}`}
                         disabled={isProcessing}
-                        className="w-16 text-center px-2 py-2 text-sm font-medium focus:outline-none disabled:opacity-50"
+                        className="w-16 text-center px-2 py-2 text-sm font-medium focus:outline-none disabled:opacity-50 bg-slate-700 text-white"
                       />
 
                       <button
                         type="button"
                         onClick={() => incrementar(receta.id, Math.max(1, maxDisponible))}
                         aria-label={`Incrementar cantidad de ${receta.nombre}`}
-                        className="flex items-center justify-center px-3 py-2 text-sm bg-gradient-to-br from-sky-600 to-indigo-600 text-white hover:brightness-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="flex items-center justify-center px-3 py-2 text-sm bg-gradient-to-r from-yellow-500 to-orange-500 text-white hover:from-yellow-600 hover:to-orange-600 disabled:opacity-40 disabled:cursor-not-allowed transition"
                         disabled={!puedeHacer || cantidadClamped >= maxDisponible || isProcessing}
                       >
                         +
@@ -238,9 +246,9 @@ export default function NuevaOrden({
                     <button
                       onClick={() => confirmarOrdenInline(receta.id, cantidadClamped)}
                       disabled={!puedeHacer || cantidadClamped <= 0 || maxDisponible === 0 || isProcessing}
-                      className={`ml-18 px-3 py-2 rounded-md text-sm font-medium transition relative ${puedeHacer && maxDisponible > 0 && !isProcessing
-                        ? "bg-gradient-to-br from-sky-600 to-indigo-600 text-white hover:brightness-95"
-                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition shadow-md ${puedeHacer && maxDisponible > 0 && !isProcessing
+                        ? "bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700"
+                        : "bg-slate-600 text-slate-400 cursor-not-allowed"
                         }`}
                     >
                       {isProcessing ? (
@@ -258,7 +266,7 @@ export default function NuevaOrden({
                   </div>
 
                   {!puedeHacer && (
-                    <p className="text-xs text-red-600 font-medium">⚠️ Sin stock</p>
+                    <p className="text-xs text-red-400 font-medium">⚠️ Sin stock</p>
                   )}
                 </div>
               </article>

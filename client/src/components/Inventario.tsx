@@ -83,48 +83,38 @@ export default function InventarioList({
 
   return (
     <div className="px-2 sm:px-4 md:px-6 max-w-7xl mx-auto">
-      <div className="flex flex-col items-center gap-4 mb-6">
-        <div className="text-sm text-gray-600 text-center">
+      <div className="flex flex-col gap-4 mb-6">
+        <div className="text-sm text-slate-300 text-center">
           {porBusqueda.length} de {ingredientes.length} ingredientes
         </div>
 
         <div className="w-full flex justify-center">
-          <div className="w-full max-w-4xl mx-auto min-w-0">
-            <div className="flex flex-col sm:flex-row items-center gap-3">
-              <div className="min-w-0 w-full">
-                <div className="min-w-0 sm:w-auto">
-                  <Filtros
-                    titulo="Categoría"
-                    categorias={CATEGORIAS_INGREDIENTES}
-                    categoriaActiva={categoriaActiva}
-                    onCambiarCategoria={(c: string) =>
-                      onQueryOrFilterChange(undefined, c)
-                    }
-                    onChangeQuery={(e: string) =>
-                      onQueryOrFilterChange(e, undefined)
-                    }
-                    mostrarTodos={true}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+          <Filtros
+            titulo="Categoría"
+            categorias={CATEGORIAS_INGREDIENTES}
+            categoriaActiva={categoriaActiva}
+            onCambiarCategoria={(c: string) =>
+              onQueryOrFilterChange(undefined, c)
+            }
+            onChangeQuery={(e: string) => onQueryOrFilterChange(e, undefined)}
+            mostrarTodos={true}
+          />
         </div>
       </div>
 
       <div className="mb-4">
         {ingredientesBajos > 0 && (
-          <p className="text-sm text-red-600 mt-1 flex items-center gap-2 justify-center">
+          <p className="text-sm text-red-400 mt-1 flex items-center gap-2 justify-center font-medium">
             <AlertTriangle size={16} />
-            {ingredientesBajos} ingrediente{ingredientesBajos !== 1 ? "s" : ""}{" "}
-            con stock bajo
+            {ingredientesBajos} ingrediente
+            {ingredientesBajos !== 1 ? "s" : ""} con stock bajo
           </p>
         )}
       </div>
 
       <div className="space-y-3 md:hidden">
         {visibleIngredientes.length === 0 ? (
-          <div className="bg-white p-6 rounded-lg shadow-md text-center text-gray-500">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-700 p-6 rounded-lg shadow-md text-center text-slate-300 border border-slate-600">
             No hay ingredientes que coincidan
           </div>
         ) : (
@@ -133,52 +123,44 @@ export default function InventarioList({
             return (
               <div
                 key={ing.id}
-                className={`bg-white p-3 rounded-lg shadow-sm border ${
-                  low ? "border-red-100 bg-red-50" : "border-gray-100"
-                }`}
+                className={`p-3 rounded-lg shadow-md border ${low
+                  ? "bg-gradient-to-br from-slate-800 to-slate-700 border-red-500/50"
+                  : "bg-gradient-to-br from-slate-800 to-slate-700 border-slate-600"
+                  }`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="text-sm font-semibold text-gray-900 truncate">
+                    <div className={`text-sm font-semibold truncate ${low ? "text-red-400" : "text-white"}`}>
                       {ing.nombre}
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">
+                    <div className={`text-xs mt-1 ${low ? "text-red-300" : "text-slate-400"}`}>
                       {ing.categoria ?? "—"}
                     </div>
                   </div>
 
                   <div className="text-right">
-                    <div
-                      className={`text-lg font-semibold ${
-                        low ? "text-red-600" : "text-gray-900"
-                      }`}
-                    >
+                    <div className={`text-lg font-semibold ${low ? "text-red-400" : "text-yellow-400"}`}>
                       {ing.cantidad}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className={`text-xs ${low ? "text-red-300" : "text-slate-400"}`}>
                       {ing.unidad ?? "—"}
                     </div>
                   </div>
                 </div>
 
                 <div className="mt-3 flex items-center justify-between gap-2">
-                  <div className="text-sm text-gray-600">
+                  <div className={`text-sm ${low ? "text-slate-300" : "text-slate-300"}`}>
                     Mínimo:{" "}
-                    <span
-                      className={`font-medium ${
-                        low ? "text-red-600" : "text-gray-700"
-                      }`}
-                    >
+                    <span className={`font-medium ${low ? "text-red-400" : "text-yellow-400"}`}>
                       {ing.minimo}
                     </span>
                   </div>
                   <button
                     onClick={() => abrirModal(ing)}
-                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition ${
-                      low
-                        ? "bg-red-600 text-white"
-                        : "bg-green-50 text-green-700"
-                    }`}
+                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition shadow-md ${low
+                      ? "bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700"
+                      : "bg-gradient-to-r from-yellow-500 to-orange-500 text-white hover:from-yellow-600 hover:to-orange-600"
+                      }`}
                     aria-label={`Reabastecer ${ing.nombre}`}
                   >
                     <PackagePlus size={16} />
@@ -191,82 +173,71 @@ export default function InventarioList({
         )}
       </div>
 
+      {/* Tabla para desktop */}
       <div className="hidden md:block">
         {porBusqueda.length === 0 ? (
-          <div className="bg-white p-8 rounded-lg shadow-md text-center text-gray-500">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-700 p-8 rounded-lg shadow-md text-center text-slate-300 border border-slate-600">
             No hay ingredientes que coincidan
           </div>
         ) : (
-          <div className="overflow-x-auto bg-white rounded-lg shadow-sm">
-            <table className="min-w-[720px] w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+          <div className="overflow-x-auto bg-slate-800 rounded-lg shadow-lg border border-slate-700">
+            <table className="min-w-[720px] w-full divide-y divide-slate-700">
+              <thead className="bg-gradient-to-r from-slate-700 to-slate-600">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
                     Nombre
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider hidden lg:table-cell">
                     Categoría
                   </th>
-                  <th className="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-right text-xs font-medium text-slate-300 uppercase tracking-wider">
                     Cantidad
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider hidden sm:table-cell">
                     Unidad
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider hidden sm:table-cell">
                     Mínimo
                   </th>
-                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-center text-xs font-medium text-slate-300 uppercase tracking-wider">
                     Acción
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-slate-800 divide-y divide-slate-700">
                 {visibleIngredientes.map((ing) => {
                   const low = ing.cantidad <= ing.minimo;
                   return (
-                    <tr key={ing.id} className={low ? "bg-red-50" : ""}>
+                    <tr key={ing.id} className={low ? "bg-slate-700/50" : "hover:bg-slate-700/30"}>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900 truncate max-w-[260px]">
+                        <div className={`text-sm font-medium truncate max-w-[260px] ${low ? "text-red-400" : "text-white"}`}>
                           {ing.nombre}
                         </div>
-                        <div className="text-xs text-gray-500 mt-1 hidden lg:block">
+                        <div className={`text-xs mt-1 hidden lg:block ${low ? "text-red-300" : "text-slate-400"}`}>
                           {ing.categoria}
                         </div>
                       </td>
 
                       <td className="px-4 py-3 whitespace-nowrap hidden lg:table-cell">
-                        <div
-                          className={`text-sm ${
-                            low ? "text-red-600 font-medium" : "text-gray-700"
-                          }`}
-                        >
+                        <div className={`text-sm ${low ? "text-red-400 font-medium" : "text-slate-300"}`}>
                           {ing.categoria ?? "—"}
                         </div>
                       </td>
 
                       <td className="px-3 py-3 whitespace-nowrap text-right">
-                        <div
-                          className={`text-lg font-semibold ${
-                            low ? "text-red-600" : "text-gray-900"
-                          }`}
-                        >
+                        <div className={`text-lg font-semibold ${low ? "text-red-400" : "text-yellow-400"}`}>
                           {ing.cantidad}
                         </div>
                       </td>
 
                       <td className="px-4 py-3 whitespace-nowrap hidden sm:table-cell">
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm text-slate-400">
                           {ing.unidad ?? "—"}
                         </div>
                       </td>
 
                       <td className="px-4 py-3 whitespace-nowrap hidden sm:table-cell">
-                        <div
-                          className={`text-sm ${
-                            low ? "text-red-600" : "text-gray-600"
-                          }`}
-                        >
+                        <div className={`text-sm ${low ? "text-red-400 font-medium" : "text-slate-400"}`}>
                           {ing.minimo}
                         </div>
                       </td>
@@ -274,11 +245,10 @@ export default function InventarioList({
                       <td className="px-4 py-3 whitespace-nowrap text-center">
                         <button
                           onClick={() => abrirModal(ing)}
-                          className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition ${
-                            low
-                              ? "bg-red-600 text-white"
-                              : "bg-green-50 text-green-700"
-                          }`}
+                          className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition shadow-md ${low
+                            ? "bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700"
+                            : "bg-gradient-to-r from-yellow-500 to-orange-500 text-white hover:from-yellow-600 hover:to-orange-600"
+                            }`}
                           aria-label={`Reabastecer ${ing.nombre}`}
                         >
                           <PackagePlus size={16} />
@@ -291,8 +261,8 @@ export default function InventarioList({
               </tbody>
             </table>
 
-            <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-3 bg-white border-t gap-2">
-              <div className="text-sm text-gray-700">
+            <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-3 bg-slate-700/50 border-t border-slate-600 gap-2">
+              <div className="text-sm text-slate-300 font-medium">
                 Página {currentPageClamped} de {totalPages}
               </div>
 
@@ -300,7 +270,7 @@ export default function InventarioList({
                 <button
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPageClamped === 1}
-                  className="px-3 py-1 rounded-md border text-sm disabled:opacity-40"
+                  className="px-3 py-1 rounded-md bg-slate-600 border border-slate-500 text-sm text-slate-200 disabled:opacity-40 hover:bg-slate-500 transition"
                 >
                   Anterior
                 </button>
@@ -309,7 +279,7 @@ export default function InventarioList({
                     setCurrentPage((p) => Math.min(totalPages, p + 1))
                   }
                   disabled={currentPageClamped === totalPages}
-                  className="px-3 py-1 rounded-md border text-sm disabled:opacity-40"
+                  className="px-3 py-1 rounded-md bg-slate-600 border border-slate-500 text-sm text-slate-200 disabled:opacity-40 hover:bg-slate-500 transition"
                 >
                   Siguiente
                 </button>

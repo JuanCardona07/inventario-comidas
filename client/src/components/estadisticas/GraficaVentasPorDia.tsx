@@ -53,12 +53,12 @@ export default function GraficaVentasPorDia({
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-semibold">{payload[0].payload.fecha}</p>
-          <p className="text-green-600">
-            Ventas: {currency.format(payload[0].payload.ventas)}
+        <div className="bg-gradient-to-br from-slate-800 to-slate-700 p-4 border border-slate-600 rounded-lg shadow-xl">
+          <p className="font-semibold text-white mb-2">{payload[0].payload.fecha}</p>
+          <p className="text-emerald-400 text-sm">
+            Ventas: <span className="font-bold">{currency.format(payload[0].payload.ventas)}</span>
           </p>
-          <p className="text-blue-600">Órdenes: {payload[0].payload.ordenes}</p>
+          <p className="text-blue-400 text-sm">Órdenes: <span className="font-bold">{payload[0].payload.ordenes}</span></p>
         </div>
       );
     }
@@ -67,21 +67,22 @@ export default function GraficaVentasPorDia({
 
   if (datos.length === 1) {
     return (
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">
-          📈 Ventas por Día
+      <div className="bg-gradient-to-br from-slate-800 to-slate-700 p-6 rounded-xl shadow-lg border border-slate-600">
+        <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+          <span className="text-2xl">📈</span>
+          Ventas por Día
         </h3>
         <div className="flex flex-col items-center justify-center h-64 text-center">
           <div className="text-6xl mb-4">📊</div>
-          <p className="text-gray-600 mb-2">
+          <p className="text-slate-300 mb-2">
             Solo tienes órdenes de un día ({datos[0].fecha})
           </p>
-          <div className="bg-blue-50 p-4 rounded-lg mt-4">
-            <p className="text-blue-900 font-semibold">
+          <div className="bg-slate-700 p-4 rounded-lg mt-4 border border-slate-600">
+            <p className="text-white font-semibold">
               {datos[0].ordenes} órdenes • {currency.format(datos[0].ventas)}
             </p>
           </div>
-          <p className="text-sm text-gray-500 mt-4">
+          <p className="text-sm text-slate-400 mt-4">
             💡 Crea órdenes en diferentes días para ver la gráfica de tendencia
           </p>
         </div>
@@ -90,23 +91,29 @@ export default function GraficaVentasPorDia({
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h3 className="text-lg font-bold text-gray-900 mb-4">
+    <div className="bg-gradient-to-br from-slate-800 to-slate-700 p-6 rounded-xl shadow-lg border border-slate-600">
+      <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
         📈 Ventas por Día
       </h3>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={datos}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-          <XAxis dataKey="fecha" tick={{ fontSize: 12 }} stroke="#888" />
-          <YAxis yAxisId="left" tick={{ fontSize: 12 }} stroke="#888" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#475569" opacity={0.3} />
+          <XAxis dataKey="fecha" tick={{ fontSize: 12, fill: "#cbd5e1" }} stroke="#64748b" />
+          <YAxis yAxisId="left" tick={{ fontSize: 12, fill: "#cbd5e1" }} stroke="#64748b" />
           <YAxis
             yAxisId="right"
             orientation="right"
-            tick={{ fontSize: 12 }}
-            stroke="#888"
+            tick={{ fontSize: 12, fill: "#cbd5e1" }}
+            stroke="#64748b"
           />
           <Tooltip content={<CustomTooltip />} />
-          <Legend />
+          <Legend
+            wrapperStyle={{
+              paddingTop: "20px",
+              color: "#cbd5e1"
+            }}
+            iconType="circle"
+          />
           <Line
             yAxisId="left"
             type="monotone"
